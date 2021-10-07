@@ -130,7 +130,6 @@ class AxisPTZ(threading.Thread):
         """
             Command for ptz movements
         """
-        #print msg
         self.setCommandPTZ(msg)
 
 
@@ -269,14 +268,13 @@ class AxisPTZ(threading.Thread):
             # Performs interaction with the camera if it is enabled
             if self.run_control:
                 self.controlPTZ()
-                #print 'Alive'
             # Publish ROS msgs
             self.publishROS()
 
 
             r.sleep()
 
-        print 'Bye!'
+        print("Bye!")
 
 
     def publishROS(self):
@@ -319,8 +317,6 @@ class AxisPTZ(threading.Thread):
         """
             Callback when a peer has subscribed from a topic
         """
-        #print 'Is control loop enabled? %s'%self.run_control
-
 
         if not self.run_control:
             self.start_control()
@@ -332,7 +328,6 @@ class AxisPTZ(threading.Thread):
         #print 'Num of peers = %d'%num_peers
 
         if num_peers == 0:
-            #print 'Stopping control'
             self.stop_control()
 
     def getStateDiagnostic(self, stat):
@@ -524,7 +519,7 @@ def main():
     axis_node_name = rospy.get_name()
     axis_node_namespace = rospy.get_namespace()
 
-    print 'namespace = %s, name = %s'%(axis_node_namespace, axis_node_name)
+    print("namespace = %s, name = %s"%(axis_node_namespace, axis_node_name))
 
     # default params
     arg_defaults = {
