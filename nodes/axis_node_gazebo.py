@@ -153,8 +153,12 @@ class AxisPTZ(threading.Thread):
             new_zoom = self.desired_zoom + command.zoom
 
         else:
-            new_pan = math.degrees(invert_command*command.pan)
-            new_tilt = math.degrees(invert_command*command.tilt)
+            # new_pan = math.degrees(invert_command*command.pan)
+            # new_tilt = math.degrees(invert_command*command.tilt)
+            # The input values are daians and the comands sent through topics are radians also
+            # So no need for degrees conversion
+            new_pan = invert_command*command.pan
+            new_tilt = invert_command*command.tilt
             new_zoom = command.zoom
 
 
@@ -199,6 +203,7 @@ class AxisPTZ(threading.Thread):
         """
         # Only if it's syncronized
         if self.ptz_syncronized:
+            rospy.logdebug("Sending Command==>PAN="+str(self.desired_pan)+",TILT="+str(self.desired_tilt)+",ZOOM="+str(self.desired_zoom))
             #if self.isPTZinPosition():
             self.sendPTZCommand()
             #else:
@@ -210,9 +215,9 @@ class AxisPTZ(threading.Thread):
             @return True if camera has the desired position / settings
         """
         if abs(self.current_ptz.pan - self.desired_pan) <= self.error_pos and abs(self.current_ptz.tilt - self.desired_tilt) <= self.error_pos and abs(self.current_ptz.zoom - self.desired_zoom) <= self.error_zoom:
-            '''rospy.logwarn('isPTZinPosition: pan %.3lf vs %.3lf', self.current_ptz.pan, self.desired_pan)
+            rospy.logwarn('isPTZinPosition: pan %.3lf vs %.3lf', self.current_ptz.pan, self.desired_pan)
             rospy.logwarn('isPTZinPosition: tilt %.3lf vs %.3lf', self.current_ptz.tilt, self.desired_tilt)
-            rospy.logwarn('isPTZinPosition: zoom %.3lf vs %.3lf', self.current_ptz.zoom, self.desired_zoom)'''
+            rospy.logwarn('isPTZinPosition: zoom %.3lf vs %.3lf', self.current_ptz.zoom, self.desired_zoom)
             return True
         else:
             return False
@@ -514,7 +519,7 @@ class Axis():
 
 def main():
 
-    rospy.init_node("axis_camera")
+    rospy.init_node("axis_camera", log_level=rospy.WARN)
 
     axis_node_name = rospy.get_name()
     axis_node_namespace = rospy.get_namespace()
@@ -539,8 +544,8 @@ def main():
       'eflip': False,
       'pan_joint': 'pan',
       'tilt_joint': 'tilt',
-      'pan_joint_command': 'joint_pan_position_controller/command',
-      'tilt_joint_command': 'joint_tilt_position_controller/command',
+      'pan_joint_command': '/rbcar/front_ptz_camera_pan_joint_position_controller/command',
+      'tilt_joint_command': '/rbcar/front_ptz_camera_tilt_joint_position_controller/command',
       'min_pan_value': -2.97,
       'max_pan_value': 2.97,
       'min_tilt_value': 0,
